@@ -4,7 +4,7 @@
 
 using namespace std;
 
-enum Filters {Grayscale = 1, BlackAndWhite = 2,Flip = 5, Rotate = 6};
+enum Filters {Grayscale = 1, BlackAndWhite = 2,Frame = 4 ,Flip = 5, Rotate = 6 , Resizing = 8};
 
 void grayscalefilter(Image& image)
 {
@@ -125,6 +125,46 @@ void RotateImage(Image& image, int angle)
 	}
 }
 
+void framefilter(Image& image) {
+    int border = 15;
+    int r, g, b;
+
+    cout << "Enter RGB color for frame (0-255): ";
+    cin >> r >> g >> b;
+
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            if (i < border || i >= image.width - border || j < border || j >= image.height - border) {
+                image(i, j, 0) = r;
+                image(i, j, 1) = g;
+                image(i, j, 2) = b;
+            }
+        }
+    }
+    cout << "Frame added\n";
+}
+
+void resizefilter(Image& image) { int W, H;
+    cout << "Enter new width and height: "; 
+    cin >> W >> H;
+Image resized(W, H);
+float scalex = (float)image.width / W;
+float scaley = (float)image.height / H;
+
+for (int x = 0; x < W; x++) {
+    for (int y = 0; y < H; y++) {
+        int oldx = x * scalex;
+        int oldy = y * scaley;
+
+        for (int c = 0; c < image.channels; c++) {
+            resized(x, y, c) = image(oldx, oldy, c);
+        }
+    }
+}
+image = resized;
+cout << "Image resized\n";
+}
+
 int main()
 {
 	string filename;
@@ -137,8 +177,10 @@ int main()
 	cout << "Please choose a filter from this menu: \n";
 	cout << "1. Grayscale \n";
     cout << "2. Black and White \n";
+	cout << "4 Frame \n;
 	cout << "5. Flip \n";
 	cout << "6. Rotate \n";
+	cout << "8 Resizing \n";
 	cout << "Enter your filter number:  ";
 	cin >> FilterNum;
 
@@ -171,6 +213,12 @@ int main()
 
 		flipfilter(image);
             break;
+		case Filters::Frame:
+			framefilter(image);
+			break;
+		case Filters::Resizing:
+		resizingfilter(image);
+		break;
 
 	default:
             cout << "Invalid filter number";
