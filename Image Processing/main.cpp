@@ -4,7 +4,37 @@
 
 using namespace std;
 
-enum Filters {BlackAndWhite = 1 , Rotate = 2};
+enum Filters {Grayscale = 1, BlackAndWhite = 2,Flip = 5, Rotate = 6};
+void grayscalefilter(Image& image){
+    for (int i = 0; i<  image.width; ++i){
+        for (int j = 0; j < image.height; ++j){
+
+            unsigned char R = image(i, j, 0);
+            unsigned char G = image(i, j, 1);
+            unsigned char B = image(i, j, 2);
+
+            unsigned char gray = 0.299*R + 0.587*G + 0.114*B;
+
+            image(i, j, 0) = gray;
+            image(i, j, 1) = gray;
+            image(i, j, 2) = gray;
+        }   
+    }
+}
+
+void flipfilter(Image& image) {
+    for (int i = 0; i < image.width/2; ++i){
+        for (int j = 0; j < image.height; ++j){
+            for (int k = 0; k < 3; ++k){
+                unsigned char temp = image(i, j, k);
+
+            image(i, j, k) = image(image.width -1 -i, j, k);
+            
+            image(image.width -1 -i, j, k) = temp;
+            }
+        }
+    }
+}
 
 void ApplyBlackAndWhite(Image& image)
 {
@@ -90,15 +120,18 @@ void RotateImage(Image& image, int angle)
 int main()
 {
 	string filename;
-	cout << "Please enter colored image name : ";
+	cout << "Please enter colored image name with extension: ";
 	cin >> filename;
 
 	Image image(filename);
 
 	int FilterNum;
-	cout << "Please choose a filter : \n";
-	cout << "1. Black and White \n";
-	cout << "2. Rotate \n";
+	cout << "Please choose a filter from this menu: \n";
+	cout << "1. Grayscale \n";
+    cout << "2. Black and White \n";
+	cout << "5. Flip \n";
+	cout << "6. Rotate \n";
+	cout << "Enter your filter number:  ";
 	cin >> FilterNum;
 
 	switch (FilterNum)
@@ -112,13 +145,23 @@ int main()
 
 		int angle;
 		cout << "Please choose the angle of Rotation : \n";
-		cout << "1. Rotate 90° \n";
-		cout << "2. Rotate 180° \n";
-		cout << "3. Rotate 270° \n";
+		cout << "1. Rotate 90 \n";
+		cout << "2. Rotate 180 \n";
+		cout << "3. Rotate 270 \n";
 		cin >> angle;
 
 		RotateImage(image, angle);
 		break;
+
+	case Filters:: Grayscale:
+		grayscalefilter(image);
+            break;
+	case Filters::Flip:
+		flipfilter(image);
+            break;
+	default:
+            cout << "Invalid filter number";
+            return 1;		
 
 	}
 
