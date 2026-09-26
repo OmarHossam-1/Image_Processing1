@@ -5,9 +5,13 @@
 using namespace std;
 
 enum Filters {Grayscale = 1, BlackAndWhite = 2,Flip = 5, Rotate = 6};
-void grayscalefilter(Image& image){
-    for (int i = 0; i<  image.width; ++i){
-        for (int j = 0; j < image.height; ++j){
+
+void grayscalefilter(Image& image)
+{
+    for (int i = 0; i<  image.width; ++i)
+	{
+        for (int j = 0; j < image.height; ++j)
+		{
 
             unsigned char R = image(i, j, 0);
             unsigned char G = image(i, j, 1);
@@ -22,10 +26,14 @@ void grayscalefilter(Image& image){
     }
 }
 
-void flipfilter(Image& image) {
-    for (int i = 0; i < image.width/2; ++i){
-        for (int j = 0; j < image.height; ++j){
-            for (int k = 0; k < 3; ++k){
+void flipfilter(Image& image) 
+{
+    for (int i = 0; i < image.width/2; ++i)
+	{
+        for (int j = 0; j < image.height; ++j)
+		{
+            for (int k = 0; k < 3; ++k)
+			{
                 unsigned char temp = image(i, j, k);
 
             image(i, j, k) = image(image.width -1 -i, j, k);
@@ -144,21 +152,26 @@ int main()
 	case Filters::Rotate:
 
 		int angle;
-		cout << "Please choose the angle of Rotation : \n";
-		cout << "1. Rotate 90 \n";
-		cout << "2. Rotate 180 \n";
-		cout << "3. Rotate 270 \n";
+		
+		cout << "Please choose a rotation option:\n";
+		cout << "1. Rotate 90 degrees\n";
+		cout << "2. Rotate 180 degrees\n";
+		cout << "3. Rotate 270 degrees\n";
 		cin >> angle;
 
 		RotateImage(image, angle);
 		break;
 
 	case Filters:: Grayscale:
+
 		grayscalefilter(image);
-            break;
+        break;
+
 	case Filters::Flip:
+
 		flipfilter(image);
             break;
+
 	default:
             cout << "Invalid filter number";
             return 1;		
