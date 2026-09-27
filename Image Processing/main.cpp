@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <cstdlib>
 #include "Image_Class.h"
@@ -318,4 +317,5 @@ int main()
 
     return 0;
 }
+
 
