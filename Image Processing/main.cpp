@@ -315,6 +315,8 @@ int main()
 
     cout << "Image saved successfully!\n";
 
+    system(filename.c_str());
+
     return 0;
 }
 
