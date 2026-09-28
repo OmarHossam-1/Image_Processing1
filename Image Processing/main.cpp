@@ -5,8 +5,8 @@
     Team Members:
     20250117 - Belal Ibrahim Sayed
     20250426 - Omar Hossam Eldin Zidan
-    20251551 - Ahmed
-    20253056 - Shahd
+    20251551 - Ahmed Mahmoud Roshdy
+    20253056 - Shahd Ali Mohammed
 
     Section:
 
@@ -393,25 +393,30 @@ void ApplyFilter(Image& image, int choice)
     switch (choice)
     {
     case Filters::Grayscale:
+
         GrayscaleFilter(image);
         cout << "Grayscale applied successfully!\n";
         break;
 
     case Filters::BlackAndWhite:
+
         ApplyBlackAndWhite(image);
         cout << "Black and White applied successfully!\n";
         break;
 
     case Filters::InvertImage:
+
         InvertImageFilter(image);
         cout << "Invert applied successfully!\n";
         break;
 
     case Filters::Frame:
+
         FrameFilter(image);
         break;
 
     case Filters::Flip:
+
         FlipFilter(image);
         cout << "Flip applied successfully!\n";
         break;
@@ -440,10 +445,12 @@ void ApplyFilter(Image& image, int choice)
     }
 
     case Filters::DarkenAndLighten:
+
         DarkenAndLightenImage(image);
         break;
 
     case Filters::Resizing:
+
         ResizeFilter(image);
         break;
 
