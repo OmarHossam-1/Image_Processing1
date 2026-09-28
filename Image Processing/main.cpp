@@ -1,19 +1,49 @@
+/*
+    CS213 - OOP Programming Assignment 1
+    Part 1
+
+    Team Members:
+    20250117 - Belal Ibrahim Sayed
+    20250426 - Omar Hossam Eldin Zidan
+    20251551 - Ahmed
+    20253056 - Shahd
+
+    Section:
+
+    Filter Distribution:
+    Belal  : Filters 1, 5, 9, 13
+    Omar   : Filters 2, 6, 10, 14
+    Ahmed  : Filters 3, 7, 11, 15
+    Shahd  : Filters 4, 8, 12, 16
+
+    Part 1:
+    8 Filters + Console Menu
+*/
+
 #include <iostream>
+#include <algorithm>
 #include <cstdlib>
 #include "Image_Class.h"
 
 using namespace std;
 
-enum Filters {
+enum Filters
+{
     Grayscale = 1,
     BlackAndWhite = 2,
+    InvertImage = 3,
     Frame = 4,
     Flip = 5,
     Rotate = 6,
+    DarkenAndLighten = 7,
     Resizing = 8
 };
 
-void grayscalefilter(Image& image)
+
+
+ // FILTERS
+
+void GrayscaleFilter(Image& image)
 {
     for (int i = 0; i < image.width; ++i)
     {
@@ -23,7 +53,8 @@ void grayscalefilter(Image& image)
             unsigned char G = image(i, j, 1);
             unsigned char B = image(i, j, 2);
 
-            unsigned char gray = 0.299 * R + 0.587 * G + 0.114 * B;
+            unsigned char gray =
+                (unsigned char)(0.299 * R + 0.587 * G + 0.114 * B);
 
             image(i, j, 0) = gray;
             image(i, j, 1) = gray;
@@ -32,24 +63,6 @@ void grayscalefilter(Image& image)
     }
 }
 
-void flipfilter(Image& image)
-{
-    for (int i = 0; i < image.width / 2; ++i)
-    {
-        for (int j = 0; j < image.height; ++j)
-        {
-            for (int k = 0; k < 3; ++k)
-            {
-                unsigned char temp = image(i, j, k);
-
-                image(i, j, k) =
-                    image(image.width - 1 - i, j, k);
-
-                image(image.width - 1 - i, j, k) = temp;
-            }
-        }
-    }
-}
 
 void ApplyBlackAndWhite(Image& image)
 {
@@ -78,79 +91,24 @@ void ApplyBlackAndWhite(Image& image)
     }
 }
 
-void RotateImage(Image& image, int angle)
+
+void InvertImageFilter(Image& image)
 {
-    if (angle == 1)
+    for (int i = 0; i < image.width; ++i)
     {
-        Image rotated(image.height, image.width);
-
-        for (int i = 0; i < image.width; i++)
+        for (int j = 0; j < image.height; ++j)
         {
-            for (int j = 0; j < image.height; j++)
+            for (int k = 0; k < 3; ++k)
             {
-                rotated(image.height - 1 - j, i, 0) =
-                    image(i, j, 0);
-
-                rotated(image.height - 1 - j, i, 1) =
-                    image(i, j, 1);
-
-                rotated(image.height - 1 - j, i, 2) =
-                    image(i, j, 2);
+                image(i, j, k) =
+                    255 - image(i, j, k);
             }
         }
-
-        image = rotated;
-    }
-
-    else if (angle == 2)
-    {
-        Image rotated(image.width, image.height);
-
-        for (int i = 0; i < image.width; i++)
-        {
-            for (int j = 0; j < image.height; j++)
-            {
-                rotated(image.width - 1 - i,
-                    image.height - 1 - j, 0) =
-                    image(i, j, 0);
-
-                rotated(image.width - 1 - i,
-                    image.height - 1 - j, 1) =
-                    image(i, j, 1);
-
-                rotated(image.width - 1 - i,
-                    image.height - 1 - j, 2) =
-                    image(i, j, 2);
-            }
-        }
-
-        image = rotated;
-    }
-
-    else if (angle == 3)
-    {
-        Image rotated(image.height, image.width);
-
-        for (int i = 0; i < image.width; i++)
-        {
-            for (int j = 0; j < image.height; j++)
-            {
-                rotated(j, image.width - 1 - i, 0) =
-                    image(i, j, 0);
-
-                rotated(j, image.width - 1 - i, 1) =
-                    image(i, j, 1);
-
-                rotated(j, image.width - 1 - i, 2) =
-                    image(i, j, 2);
-            }
-        }
-
-        image = rotated;
     }
 }
 
-void framefilter(Image& image)
+
+void FrameFilter(Image& image)
 {
     int border = 15;
     int r, g, b;
@@ -182,10 +140,150 @@ void framefilter(Image& image)
         }
     }
 
-    cout << "Frame added\n";
+    cout << "Frame added successfully!\n";
 }
 
-void resizefilter(Image& image)
+
+void FlipFilter(Image& image)
+{
+    for (int i = 0; i < image.width / 2; ++i)
+    {
+        for (int j = 0; j < image.height; ++j)
+        {
+            for (int k = 0; k < 3; ++k)
+            {
+                unsigned char temp = image(i, j, k);
+
+                image(i, j, k) =
+                    image(image.width - 1 - i, j, k);
+
+                image(image.width - 1 - i, j, k) =
+                    temp;
+            }
+        }
+    }
+}
+
+
+void RotateImage(Image& image, int angle)
+{
+    // 90 degrees
+    if (angle == 1)
+    {
+        Image rotated(image.height, image.width);
+
+        for (int i = 0; i < image.width; i++)
+        {
+            for (int j = 0; j < image.height; j++)
+            {
+                rotated(image.height - 1 - j, i, 0) =
+                    image(i, j, 0);
+
+                rotated(image.height - 1 - j, i, 1) =
+                    image(i, j, 1);
+
+                rotated(image.height - 1 - j, i, 2) =
+                    image(i, j, 2);
+            }
+        }
+
+        image = rotated;
+    }
+
+    // 180 degrees
+    else if (angle == 2)
+    {
+        Image rotated(image.width, image.height);
+
+        for (int i = 0; i < image.width; i++)
+        {
+            for (int j = 0; j < image.height; j++)
+            {
+                rotated(image.width - 1 - i,
+                    image.height - 1 - j, 0) =
+                    image(i, j, 0);
+
+                rotated(image.width - 1 - i,
+                    image.height - 1 - j, 1) =
+                    image(i, j, 1);
+
+                rotated(image.width - 1 - i,
+                    image.height - 1 - j, 2) =
+                    image(i, j, 2);
+            }
+        }
+
+        image = rotated;
+    }
+
+    // 270 degrees
+    else if (angle == 3)
+    {
+        Image rotated(image.height, image.width);
+
+        for (int i = 0; i < image.width; i++)
+        {
+            for (int j = 0; j < image.height; j++)
+            {
+                rotated(j, image.width - 1 - i, 0) =
+                    image(i, j, 0);
+
+                rotated(j, image.width - 1 - i, 1) =
+                    image(i, j, 1);
+
+                rotated(j, image.width - 1 - i, 2) =
+                    image(i, j, 2);
+            }
+        }
+
+        image = rotated;
+    }
+}
+
+
+void DarkenAndLightenImage(Image& image)
+{
+    int choice;
+
+    cout << "\n1. Darken Image\n";
+    cout << "2. Lighten Image\n";
+    cout << "Enter choice: ";
+    cin >> choice;
+
+    if (choice != 1 && choice != 2)
+    {
+        cout << "Invalid choice\n";
+        return;
+    }
+
+    for (int i = 0; i < image.width; ++i)
+    {
+        for (int j = 0; j < image.height; ++j)
+        {
+            for (int k = 0; k < 3; ++k)
+            {
+                if (choice == 1)
+                {
+                    image(i, j, k) =
+                        (unsigned char)(image(i, j, k) * 0.5);
+                }
+                else
+                {
+                    image(i, j, k) =
+                        (unsigned char)min(
+                            255,
+                            (int)(image(i, j, k) * 1.5)
+                        );
+                }
+            }
+        }
+    }
+
+    cout << "Brightness filter applied successfully!\n";
+}
+
+
+void ResizeFilter(Image& image)
 {
     int W, H;
 
@@ -207,8 +305,8 @@ void resizefilter(Image& image)
     {
         for (int y = 0; y < H; y++)
         {
-            int oldx = x * scalex;
-            int oldy = y * scaley;
+            int oldx = (int)(x * scalex);
+            int oldy = (int)(y * scaley);
 
             for (int c = 0; c < image.channels; c++)
             {
@@ -220,93 +318,40 @@ void resizefilter(Image& image)
 
     image = resized;
 
-    cout << "Image resized\n";
+    cout << "Image resized successfully!\n";
 }
 
-int main()
+
+
+// LOAD / SAVE
+
+bool LoadImage(Image& image)
 {
     string filename;
 
-    cout << "Please enter colored image name with extension: ";
+    cout << "\nEnter colored image name with extension: ";
     cin >> filename;
 
-    Image image(filename);
-
-    int FilterNum;
-
-    cout << "\nPlease choose a filter from this menu:\n";
-    cout << "1. Grayscale\n";
-    cout << "2. Black and White\n";
-    cout << "4. Frame\n";
-    cout << "5. Flip\n";
-    cout << "6. Rotate\n";
-    cout << "8. Resizing\n";
-
-    cout << "Enter your filter number: ";
-    cin >> FilterNum;
-
-    switch (FilterNum)
+    try
     {
-    case Filters::BlackAndWhite:
+        image.loadNewImage(filename);
 
-        ApplyBlackAndWhite(image);
-
-        break;
-
-    case Filters::Rotate:
+        cout << "Image loaded successfully!\n";
+        return true;
+    }
+    catch (...)
     {
-        int angle;
-
-        cout << "Please choose a rotation option:\n";
-        cout << "1. Rotate 90 degrees\n";
-        cout << "2. Rotate 180 degrees\n";
-        cout << "3. Rotate 270 degrees\n";
-
-        cin >> angle;
-
-        if (angle < 1 || angle > 3)
-        {
-            cout << "Invalid rotation option\n";
-            return 1;
-        }
-
-        RotateImage(image, angle);
-
-        break;
+        cout << "Failed to load image.\n";
+        return false;
     }
+}
 
-    case Filters::Grayscale:
 
-        grayscalefilter(image);
+void SaveImage(Image& image)
+{
+    string filename;
 
-        break;
-
-    case Filters::Flip:
-
-        flipfilter(image);
-
-        break;
-
-    case Filters::Frame:
-
-        framefilter(image);
-
-        break;
-
-    case Filters::Resizing:
-
-        resizefilter(image);
-
-        break;
-
-    default:
-
-        cout << "Invalid filter number\n";
-
-        return 1;
-    }
-
-    cout << "\nPlease enter image name to store new image\n";
+    cout << "\nEnter image name to store new image\n";
     cout << "and specify extension .jpg, .bmp, .png, .tga: ";
 
     cin >> filename;
@@ -316,6 +361,193 @@ int main()
     cout << "Image saved successfully!\n";
 
     system(filename.c_str());
+}
+
+
+
+// FILTER MENU
+
+
+void ShowFilterMenu()
+{
+    cout << "\n=============================\n";
+    cout << "         FILTERS MENU\n";
+    cout << "=============================\n";
+
+    cout << "1. Grayscale\n";
+    cout << "2. Black and White\n";
+    cout << "3. Invert Image\n";
+    cout << "4. Frame\n";
+    cout << "5. Flip\n";
+    cout << "6. Rotate\n";
+    cout << "7. Darken and Lighten\n";
+    cout << "8. Resizing\n";
+    cout << "0. Back\n";
+
+    cout << "=============================\n";
+}
+
+
+void ApplyFilter(Image& image, int choice)
+{
+    switch (choice)
+    {
+    case Filters::Grayscale:
+        GrayscaleFilter(image);
+        cout << "Grayscale applied successfully!\n";
+        break;
+
+    case Filters::BlackAndWhite:
+        ApplyBlackAndWhite(image);
+        cout << "Black and White applied successfully!\n";
+        break;
+
+    case Filters::InvertImage:
+        InvertImageFilter(image);
+        cout << "Invert applied successfully!\n";
+        break;
+
+    case Filters::Frame:
+        FrameFilter(image);
+        break;
+
+    case Filters::Flip:
+        FlipFilter(image);
+        cout << "Flip applied successfully!\n";
+        break;
+
+    case Filters::Rotate:
+    {
+        int angle;
+
+        cout << "\n1. Rotate 90 degrees\n";
+        cout << "2. Rotate 180 degrees\n";
+        cout << "3. Rotate 270 degrees\n";
+        cout << "Enter your choice: ";
+        cin >> angle;
+
+        if (angle >= 1 && angle <= 3)
+        {
+            RotateImage(image, angle);
+            cout << "Rotation applied successfully!\n";
+        }
+        else
+        {
+            cout << "Invalid rotation option\n";
+        }
+
+        break;
+    }
+
+    case Filters::DarkenAndLighten:
+        DarkenAndLightenImage(image);
+        break;
+
+    case Filters::Resizing:
+        ResizeFilter(image);
+        break;
+
+    default:
+        cout << "Invalid filter number.\n";
+    }
+}
+
+
+void FilterMenu(Image& image)
+{
+    int choice;
+
+    do
+    {
+        ShowFilterMenu();
+
+        cout << "Enter your filter choice: ";
+        cin >> choice;
+
+        if (choice != 0)
+        {
+            ApplyFilter(image, choice);
+        }
+
+    } while (choice != 0);
+}
+
+
+// MAIN MENU
+
+void ShowMainMenu()
+{
+    cout << "\n=============================\n";
+    cout << "       IMAGE PROCESSING\n";
+    cout << "=============================\n";
+
+    cout << "1. Load Image\n";
+    cout << "2. Apply Filter\n";
+    cout << "3. Save Image\n";
+    cout << "0. Exit\n";
+
+    cout << "=============================\n";
+}
+
+
+void MainMenu()
+{
+    Image image;
+    bool imageLoaded = false;
+
+    int choice;
+
+    do
+    {
+        ShowMainMenu();
+
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            imageLoaded = LoadImage(image);
+            break;
+
+        case 2:
+            if (imageLoaded)
+            {
+                FilterMenu(image);
+            }
+            else
+            {
+                cout << "Please load an image first.\n";
+            }
+            break;
+
+        case 3:
+            if (imageLoaded)
+            {
+                SaveImage(image);
+            }
+            else
+            {
+                cout << "Please load an image first.\n";
+            }
+            break;
+
+        case 0:
+            cout << "Exiting program...\n";
+            break;
+
+        default:
+            cout << "Invalid choice. Please try again.\n";
+        }
+
+    } while (choice != 0);
+}
+
+
+
+int main()
+{
+    MainMenu();
 
     return 0;
 }
