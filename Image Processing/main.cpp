@@ -8,7 +8,7 @@
     20251551 - Ahmed Mahmoud Roshdy
     20253056 - Shahd Ali Mohammed
 
-    Section:
+    Section: (S7,S8)
 
     Filter Distribution:
     Belal  : Filters 1, 5, 9, 13
