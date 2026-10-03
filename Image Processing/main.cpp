@@ -36,7 +36,9 @@ enum Filters
     Flip = 5,
     Rotate = 6,
     DarkenAndLighten = 7,
-    Resizing = 8
+    Resizing = 8,
+    merge_images = 9,
+    Sunlight=13
 };
 
 enum MainMenuChoices 
@@ -308,7 +310,35 @@ void ResizeFilter(Image& image)
     image = resized;
 }
 
+void MergeFilter(Image& image1 , Image& image2) 
+{ 
+    int width = min(image1.width , image2.width); 
+    int height = min(image1.height , image2.height); 
+ 
+    for(int i = 0; i < width; ++i){ 
+        for(int j = 0; j < height; ++j){ 
+            for(int k = 0; k < 3; ++k){ 
+ 
+                image1(i, j, k) = (image1(i, j, k) + image2(i, j, k)) / 2; 
+            } 
+        } 
+    } 
+ 
+} 
 
+void SunlightFilter(Image& image , int intensity)
+{
+    for(int i = 0; i < image.width; ++i){
+        for(int j = 0; j< image.height; ++j){
+
+            int r = image(i, j, 0) + intensity;
+
+            if(r > 255) r = 255;
+
+            image(i, j, 0) = r;
+        }
+    }
+}
 
 // LOAD / SAVE
 
@@ -367,6 +397,9 @@ void ShowFilterMenu()
     cout << "6. Rotate\n";
     cout << "7. Darken and Lighten\n";
     cout << "8. Resizing\n";
+    cout << "9. Merge_images\n";
+    cout << "13. Sunlight\n";
+
     cout << "0. Back\n";
 
     cout << "=============================\n";
@@ -441,6 +474,38 @@ void ApplyFilter(Image& image, int choice)
         ResizeFilter(image);
         cout << "Image resized successfully!\n";
         break;
+
+    case Filters::merge_images:
+{
+    Image image2;
+    string filename;
+
+    cout << "\n Enter second image with it's extension: ";
+    cin >> filename;
+
+    image2.loadNewImage(filename);
+
+    MergeFilter(image, image2);
+
+    cout << "Images merged successfully!\n";
+
+    break;
+}
+
+    case Filters::Sunlight:
+    {
+        int intensity;
+        cout <<"enter sunlight intensity (1 -> 100):";
+        cin >> intensity;
+
+        while(intensity < 1 || intensity > 100){
+            cout <<"Invalid value, Enter the number of intensity bet. 1 & 100:";
+            cin>> intensity;
+        }
+
+        SunlightFilter(image , intensity);
+        break;
+    }
 
     default:
         cout << "Invalid filter number.\n";
