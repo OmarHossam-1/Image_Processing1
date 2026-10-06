@@ -38,7 +38,10 @@ enum Filters
     DarkenAndLighten = 7,
     Resizing = 8,
     merge_images = 9,
+    Blur = 12,
+    Infrared = 16,
     Sunlight=13
+
 };
 
 enum MainMenuChoices 
@@ -342,6 +345,44 @@ void SunlightFilter(Image& image , int intensity)
 
 // LOAD / SAVE
 
+void applyBlur(Image& img) { int rad = 3; Image temp(img.width, img.height);
+for (int i = 0; i < img.width; i++) {
+    for (int j = 0; j < img.height; j++) {
+        for (int k = 0; k < img.channels; k++) {
+            int sum = 0;
+            int count = 0;
+
+            for (int dx = -rad; dx <= rad; dx++) {
+                for (int dy = -rad; dy <= rad; dy++) {
+                    int ni = i + dx;
+                    int nj = j + dy;
+
+                    if (ni >= 0 && ni < img.width && nj >= 0 && nj < img.height) {
+                        sum += img(ni, nj, k);
+                        count++;
+                    }
+                }
+            }
+            temp(i, j, k) = sum / count;
+        }
+    }
+}
+img = temp;
+cout << "Image blurred successfully\n";
+}
+
+void applyInfrared(Image& img) {
+    for (int i = 0; i < img.width; i++) {
+        for (int j = 0; j < img.height; j++) {
+            img(i, j, 0) = 255 - img(i, j, 0);
+            img(i, j, 1) = 255 - img(i, j, 1);
+            img(i, j, 2) = 255 - img(i, j, 2);
+        }
+    }
+    cout << "Image infrared successfully!\n";
+}
+
+
 bool LoadImage(Image& image)
 {
     string filename;
@@ -398,7 +439,9 @@ void ShowFilterMenu()
     cout << "7. Darken and Lighten\n";
     cout << "8. Resizing\n";
     cout << "9. Merge_images\n";
+    cout << "12. Blur\n"
     cout << "13. Sunlight\n";
+    cout << "16. Infrared\n"
 
     cout << "0. Back\n";
 
@@ -492,6 +535,7 @@ void ApplyFilter(Image& image, int choice)
     break;
 }
 
+
     case Filters::Sunlight:
     {
         int intensity;
@@ -507,10 +551,19 @@ void ApplyFilter(Image& image, int choice)
         break;
     }
 
+        case Filters::Blur:
+        applyBlur(image);
+        break;
+        
+        case Filters::Infrared:
+        applyInfrared(image);
+        break;
+        
     default:
         cout << "Invalid filter number.\n";
     }
-}
+}  
+    
 
 void FilterMenu(Image& image)
 {
