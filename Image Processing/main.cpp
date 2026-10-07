@@ -43,6 +43,7 @@ enum Filters
     Sunlight=13,
     OldTV = 14,
     Infrared = 16,
+    Oil_painting = 18,
 };
 
 enum MainMenuChoices 
@@ -473,6 +474,53 @@ void OldTVFilter(Image& image)
     }
 }
 
+void applyOilPainting(Image& img) { int radius = 3; int levels = 20;
+Image temp(img.width, img.height);
+
+for (int i = 0; i < img.width; i++) {
+    for (int j = 0; j < img.height; j++) {
+
+        int count[20] = {0};
+        int sumR[20] = {0};
+        int sumG[20] = {0};
+        int sumB[20] = {0};
+
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dy = -radius; dy <= radius; dy++) {
+                int ni = i + dx;
+                int nj = j + dy;
+
+                if (ni >= 0 && ni < img.width && nj >= 0 && nj < img.height) {
+                    int r = img(ni, nj, 0);
+                    int g = img(ni, nj, 1);
+                    int b = img(ni, nj, 2);
+
+                    int lvl = ((r + g + b) / 3) * levels / 256;
+
+                    count[lvl]++;
+                    sumR[lvl] += r;
+                    sumG[lvl] += g;
+                    sumB[lvl] += b;
+                }
+            }
+        }
+
+        int maxIndex = 0;
+        for (int k = 1; k < levels; k++) {
+            if (count[k] > count[maxIndex]) {
+                maxIndex = k;
+            }
+        }
+
+        temp(i, j, 0) = sumR[maxIndex] / count[maxIndex];
+        temp(i, j, 1) = sumG[maxIndex] / count[maxIndex];
+        temp(i, j, 2) = sumB[maxIndex] / count[maxIndex];
+    }
+}
+
+img = temp;
+}
+
 
 // LOAD / SAVE
 
@@ -539,6 +587,7 @@ void ShowFilterMenu()
     cout << "14. Old TV\n";
     cout << "15. Purple Effect\n";
     cout << "16. Infrared\n";
+    cout<< "18. Oil_paintaing
 
     cout << " 0. Back\n";
 
@@ -631,6 +680,12 @@ void ApplyFilter(Image& image, int choice)
 
         ApplyInfrared(image);
         cout << "Infrared applied successfully!\n";
+        break;
+
+        case Filters::Oil_painting:
+            
+        applyOilPainting(image);
+        cout << "Oilpainting applied successfully!\n";
         break;
 
     default:
