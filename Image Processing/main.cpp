@@ -587,7 +587,7 @@ void ShowFilterMenu()
     cout << "14. Old TV\n";
     cout << "15. Purple Effect\n";
     cout << "16. Infrared\n";
-    cout<< "18. Oil_paintaing
+    cout<< "18. Oil_paintaing\n";
 
     cout << " 0. Back\n";
 
