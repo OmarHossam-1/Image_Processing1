@@ -39,10 +39,13 @@ enum Filters
     Resizing = 8,
     merge_images = 9,
     EdgeDetection = 10,
+    Resize_Image = 11,
     Blur = 12,
-    Sunlight=13,
+    Sunlight = 13,
     OldTV = 14,
+    Tv_Effect = 15,
     Infrared = 16,
+    Skew_Image = 17,
     Oil_painting = 18,
 };
 
@@ -521,6 +524,64 @@ for (int i = 0; i < img.width; i++) {
 img = temp;
 }
 
+void ResizeImage(Image& image) 
+{
+    int new_width, new_height;
+    cout << "Enter new width and height: ";
+    cin >> new_width >> new_height;
+
+    Image new_image(new_width, new_height);
+
+    for (int i = 0; i < new_width; ++i) {
+        for (int j = 0; j < new_height; ++j) {
+            int x = i * image.width / new_width;
+            int y = j * image.height / new_height;
+
+            for (int k = 0; k < 3; ++k) {
+                new_image(i, j, k) = image(x, y, k);
+            }
+        }
+    }
+    image = new_image;
+}
+
+void TvEffect(Image& image)
+{
+    for (int j = 0; j < image.height; ++j) {
+        if (j % 2 == 0) {
+            for (int i = 0; i < image.width; ++i) {
+                for (int k = 0; k < 3; ++k) {
+                    image(i, j, k) = image(i, j, k) * 0.5;
+                }
+            }
+        }
+    }
+}
+
+void skew_image(Image& image)
+{
+    double angle;
+    cout << "Enter angle to skew: ";
+    cin >> angle;
+
+    // Convert angle to radians and calculate shift
+    double rad = angle * 3.14159 / 180.0;
+    int max_shift = image.height * tan(rad);
+
+    Image new_image(image.width + max_shift, image.height);
+
+    for (int j = 0; j < image.height; ++j) {
+        int shift = (image.height - j) * tan(rad);
+        for (int i = 0; i < image.width; ++i) {
+            for (int k = 0; k < 3; ++k) {
+                new_image(i + shift, j, k) = image(i, j, k);
+            }
+        }
+    }
+    image = new_image;
+}
+
+
 
 // LOAD / SAVE
 
@@ -581,13 +642,14 @@ void ShowFilterMenu()
     cout << " 8. Resizing\n";
     cout << " 9. Merge Images\n";
     cout << "10. Edge Detection\n";
-    cout << "11. Crop\n";
+    cout << "11. Resize Image\n";
     cout << "12. Blur\n";
     cout << "13. Sunlight\n";
     cout << "14. Old TV\n";
-    cout << "15. Purple Effect\n";
+    cout << "15. TV Effect\n";
     cout << "16. Infrared\n";
-    cout<< "18. Oil_paintaing\n";
+    cout << "17. Skew Image\n";
+    cout << "18. Oil Painting\n";
 
     cout << " 0. Back\n";
 
@@ -685,13 +747,31 @@ void ApplyFilter(Image& image, int choice)
         case Filters::Oil_painting:
             
         applyOilPainting(image);
-        cout << "Oilpainting applied successfully!\n";
+        cout << "Oil Painting applied successfully!\n";
         break;
 
-    default:
-        cout << "Invalid filter number.\n";
-        break;
-    }
+        case Filters::Resize_Image:
+
+            ResizeImage(image);
+            cout << "Resize Image applied successfully!\n";
+            break;
+
+        case Filters::Tv_Effect:
+
+            TvEffect(image);
+            cout << "TV Effect applied successfully!\n";
+            break;
+
+        case Filters::Skew_Image:
+
+            skew_image(image);
+            cout << "Skew Image applied successfully!\n";
+            break;
+
+       default:
+           cout << "Invalid filter number.\n";
+           break;
+    }  
 }
     
 
