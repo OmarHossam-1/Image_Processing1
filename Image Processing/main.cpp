@@ -38,10 +38,11 @@ enum Filters
     DarkenAndLighten = 7,
     Resizing = 8,
     merge_images = 9,
+    EdgeDetection = 10,
     Blur = 12,
+    Sunlight=13,
+    OldTV = 14,
     Infrared = 16,
-    Sunlight=13
-
 };
 
 enum MainMenuChoices 
@@ -169,10 +170,17 @@ void FlipFilter(Image& image)
     }
 }
 
-void RotateImage(Image& image, int Rotation)
+void RotateImage(Image& image)
 {
-    // 90 degrees
-    if (Rotation == 1)
+    int rotation;
+
+    cout << "\n1. Rotate 90 degrees\n";
+    cout << "2. Rotate 180 degrees\n";
+    cout << "3. Rotate 270 degrees\n";
+    cout << "Enter your choice: ";
+    cin >> rotation;
+
+    if (rotation == 1)
     {
         Image rotated(image.height, image.width);
 
@@ -180,22 +188,15 @@ void RotateImage(Image& image, int Rotation)
         {
             for (int j = 0; j < image.height; j++)
             {
-                rotated(image.height - 1 - j, i, 0) =
-                    image(i, j, 0);
-
-                rotated(image.height - 1 - j, i, 1) =
-                    image(i, j, 1);
-
-                rotated(image.height - 1 - j, i, 2) =
-                    image(i, j, 2);
+                rotated(image.height - 1 - j, i, 0) = image(i, j, 0);
+                rotated(image.height - 1 - j, i, 1) = image(i, j, 1);
+                rotated(image.height - 1 - j, i, 2) = image(i, j, 2);
             }
         }
 
         image = rotated;
     }
-
-    // 180 degrees
-    else if (Rotation == 2)
+    else if (rotation == 2)
     {
         Image rotated(image.width, image.height);
 
@@ -203,25 +204,16 @@ void RotateImage(Image& image, int Rotation)
         {
             for (int j = 0; j < image.height; j++)
             {
-                rotated(image.width - 1 - i,
-                    image.height - 1 - j, 0) =
-                    image(i, j, 0);
-
-                rotated(image.width - 1 - i,
-                    image.height - 1 - j, 1) =
-                    image(i, j, 1);
-
-                rotated(image.width - 1 - i,
-                    image.height - 1 - j, 2) =
-                    image(i, j, 2);
+                rotated(image.width - 1 - i, image.height - 1 - j, 0) = image(i, j, 0);
+                rotated(image.width - 1 - i, image.height - 1 - j, 1) = image(i, j, 1);
+                rotated(image.width - 1 - i, image.height - 1 - j, 2) = image(i, j, 2);
             }
         }
 
         image = rotated;
     }
 
-    // 270 degrees
-    else if (Rotation == 3)
+    else if (rotation == 3)
     {
         Image rotated(image.height, image.width);
 
@@ -229,18 +221,18 @@ void RotateImage(Image& image, int Rotation)
         {
             for (int j = 0; j < image.height; j++)
             {
-                rotated(j, image.width - 1 - i, 0) =
-                    image(i, j, 0);
-
-                rotated(j, image.width - 1 - i, 1) =
-                    image(i, j, 1);
-
-                rotated(j, image.width - 1 - i, 2) =
-                    image(i, j, 2);
+                rotated(j, image.width - 1 - i, 0) = image(i, j, 0);
+                rotated(j, image.width - 1 - i, 1) = image(i, j, 1);
+                rotated(j, image.width - 1 - i, 2) = image(i, j, 2);
             }
         }
 
         image = rotated;
+    }
+
+    else
+    {
+        cout << "Invalid rotation option.\n";
     }
 }
 
@@ -313,39 +305,60 @@ void ResizeFilter(Image& image)
     image = resized;
 }
 
-void MergeFilter(Image& image1 , Image& image2) 
-{ 
-    int width = min(image1.width , image2.width); 
-    int height = min(image1.height , image2.height); 
- 
-    for(int i = 0; i < width; ++i){ 
-        for(int j = 0; j < height; ++j){ 
-            for(int k = 0; k < 3; ++k){ 
- 
-                image1(i, j, k) = (image1(i, j, k) + image2(i, j, k)) / 2; 
-            } 
-        } 
-    } 
- 
-} 
-
-void SunlightFilter(Image& image , int intensity)
+void MergeFilter(Image& image)
 {
-    for(int i = 0; i < image.width; ++i){
-        for(int j = 0; j< image.height; ++j){
+    Image image2;
+    string filename;
 
+    cout << "Enter second image name: ";
+    cin >> filename;
+
+    image2.loadNewImage(filename);
+
+    int width = min(image.width, image2.width);
+    int height = min(image.height, image2.height);
+
+    for (int i = 0; i < width; i++)
+    {
+        for (int j = 0; j < height; j++)
+        {
+            for (int k = 0; k < 3; k++)
+            {
+                image(i, j, k) =
+                    (image(i, j, k) + image2(i, j, k)) / 2;
+            }
+        }
+    }
+}
+
+void SunlightFilter(Image& image)
+{
+    int intensity;
+
+    cout << "Enter sunlight intensity (1-100): ";
+    cin >> intensity;
+
+    while (intensity < 1 || intensity > 100)
+    {
+        cout << "Invalid value. Enter intensity (1-100): ";
+        cin >> intensity;
+    }
+
+    for (int i = 0; i < image.width; i++)
+    {
+        for (int j = 0; j < image.height; j++)
+        {
             int r = image(i, j, 0) + intensity;
 
-            if(r > 255) r = 255;
+            if (r > 255)
+                r = 255;
 
             image(i, j, 0) = r;
         }
     }
 }
 
-// LOAD / SAVE
-
-void applyBlur(Image& img) { int rad = 3; Image temp(img.width, img.height);
+void ApplyBlur(Image& img) { int rad = 3; Image temp(img.width, img.height);
 for (int i = 0; i < img.width; i++) {
     for (int j = 0; j < img.height; j++) {
         for (int k = 0; k < img.channels; k++) {
@@ -371,7 +384,7 @@ img = temp;
 cout << "Image blurred successfully\n";
 }
 
-void applyInfrared(Image& img) {
+void ApplyInfrared(Image& img) {
     for (int i = 0; i < img.width; i++) {
         for (int j = 0; j < img.height; j++) {
             img(i, j, 0) = 255 - img(i, j, 0);
@@ -382,6 +395,86 @@ void applyInfrared(Image& img) {
     cout << "Image infrared successfully!\n";
 }
 
+void ApplyEdgeDetection(Image& image)
+{
+    Image result(image.width, image.height);
+
+    for (int i = 0; i < image.width; i++)
+    {
+        for (int j = 0; j < image.height; j++)
+        {
+            int current = (image(i, j, 0) +
+                image(i, j, 1) +
+                image(i, j, 2)) / 3;
+
+            bool edge = false;
+
+            // compare with the pixel on the right
+            if (i < image.width - 1)
+            {
+                int right = (image(i + 1, j, 0) +
+                    image(i + 1, j, 1) +
+                    image(i + 1, j, 2)) / 3;
+
+                if (abs(current - right) > 30)
+                    edge = true;
+            }
+
+            // compare with the pixel below
+            if (j < image.height - 1)
+            {
+                int below = (image(i, j + 1, 0) +
+                    image(i, j + 1, 1) +
+                    image(i, j + 1, 2)) / 3;
+
+                if (abs(current - below) > 30)
+                    edge = true;
+            }
+
+            if (edge)
+            {
+                result(i, j, 0) = 0;
+                result(i, j, 1) = 0;
+                result(i, j, 2) = 0;
+            }
+            else
+            {
+                result(i, j, 0) = 255;
+                result(i, j, 1) = 255;
+                result(i, j, 2) = 255;
+            }
+        }
+    }
+
+    image = result;
+}
+
+void OldTVFilter(Image& image)
+{
+    for (int y = 0; y < image.height; y++)
+    {
+        for (int x = 0; x < image.width; x++)
+        {
+            int r = image(x, y, 0);
+            int g = image(x, y, 1);
+            int b = image(x, y, 2);
+
+            if (y % 2 == 1)
+            {
+                r = r / 2;
+                g = g / 2;
+                b = b / 2;
+            }
+
+            image(x, y, 0) = r;
+            image(x, y, 1) = g;
+            image(x, y, 2) = b;
+        }
+    }
+}
+
+
+// LOAD / SAVE
 
 bool LoadImage(Image& image)
 {
@@ -426,26 +519,30 @@ void SaveImage(Image& image)
 
 void ShowFilterMenu()
 {
-    cout << "\n=============================\n";
-    cout << "         FILTERS MENU\n";
-    cout << "=============================\n";
+    cout << "\n==============================\n";
+    cout << "          FILTERS MENU\n";
+    cout << "==============================\n";
 
-    cout << "1. Grayscale\n";
-    cout << "2. Black and White\n";
-    cout << "3. Invert Image\n";
-    cout << "4. Frame\n";
-    cout << "5. Flip\n";
-    cout << "6. Rotate\n";
-    cout << "7. Darken and Lighten\n";
-    cout << "8. Resizing\n";
-    cout << "9. Merge_images\n";
-    cout << "12. Blur\n"
+    cout << " 1. Grayscale\n";
+    cout << " 2. Black and White\n";
+    cout << " 3. Invert Image\n";
+    cout << " 4. Frame\n";
+    cout << " 5. Flip\n";
+    cout << " 6. Rotate\n";
+    cout << " 7. Darken and Lighten\n";
+    cout << " 8. Resizing\n";
+    cout << " 9. Merge Images\n";
+    cout << "10. Edge Detection\n";
+    cout << "11. Crop\n";
+    cout << "12. Blur\n";
     cout << "13. Sunlight\n";
-    cout << "16. Infrared\n"
+    cout << "14. Old TV\n";
+    cout << "15. Purple Effect\n";
+    cout << "16. Infrared\n";
 
-    cout << "0. Back\n";
+    cout << " 0. Back\n";
 
-    cout << "=============================\n";
+    cout << "==============================\n";
 }
 
 void ApplyFilter(Image& image, int choice)
@@ -467,7 +564,7 @@ void ApplyFilter(Image& image, int choice)
     case Filters::InvertImage:
 
         InvertImageFilter(image);
-        cout << "Invert applied successfully!\n";
+        cout << "Invert Image applied successfully!\n";
         break;
 
     case Filters::Frame:
@@ -483,86 +580,64 @@ void ApplyFilter(Image& image, int choice)
         break;
 
     case Filters::Rotate:
-    {
-        int rotation;
 
-        cout << "\n1. Rotate 90 degrees\n";
-        cout << "2. Rotate 180 degrees\n";
-        cout << "3. Rotate 270 degrees\n";
-        cout << "Enter your choice: ";
-
-        cin >> rotation;
-
-        if (rotation >= 1 && rotation <= 3)
-        {
-            RotateImage(image, rotation);
-            cout << "Rotation applied successfully!\n";
-        }
-        else
-        {
-            cout << "Invalid rotation option\n";
-        }
-
+        RotateImage(image);
+        cout << "Rotate applied successfully!\n";
         break;
-    }
 
     case Filters::DarkenAndLighten:
 
         DarkenAndLightenImage(image);
-        cout << "Brightness filter applied successfully!\n";
+        cout << "Darken and Lighten applied successfully!\n";
         break;
 
     case Filters::Resizing:
 
         ResizeFilter(image);
-        cout << "Image resized successfully!\n";
+        cout << "Resizing applied successfully!\n";
         break;
 
     case Filters::merge_images:
-{
-    Image image2;
-    string filename;
 
-    cout << "\n Enter second image with it's extension: ";
-    cin >> filename;
+        MergeFilter(image);
+        cout << "Merge Images applied successfully!\n";
+        break;
 
-    image2.loadNewImage(filename);
+    case Filters::EdgeDetection:
 
-    MergeFilter(image, image2);
+        ApplyEdgeDetection(image);
+        cout << "Edge Detection applied successfully!\n";
+        break;
 
-    cout << "Images merged successfully!\n";
+    case Filters::Blur:
 
-    break;
-}
-
+        ApplyBlur(image);
+        cout << "Blur applied successfully!\n";
+        break;
 
     case Filters::Sunlight:
-    {
-        int intensity;
-        cout <<"enter sunlight intensity (1 -> 100):";
-        cin >> intensity;
 
-        while(intensity < 1 || intensity > 100){
-            cout <<"Invalid value, Enter the number of intensity bet. 1 & 100:";
-            cin>> intensity;
-        }
+        SunlightFilter(image);
+        cout << "Sunlight applied successfully!\n";
+        break;
 
-        SunlightFilter(image , intensity);
-        break;
-    }
+    case Filters::OldTV:
 
-        case Filters::Blur:
-        applyBlur(image);
+        OldTVFilter(image);
+        cout << "Old TV applied successfully!\n";
         break;
-        
-        case Filters::Infrared:
-        applyInfrared(image);
+
+    case Filters::Infrared:
+
+        ApplyInfrared(image);
+        cout << "Infrared applied successfully!\n";
         break;
-        
+
     default:
         cout << "Invalid filter number.\n";
+        break;
     }
-}  
+}
     
 
 void FilterMenu(Image& image)
