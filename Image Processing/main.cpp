@@ -36,17 +36,17 @@ enum Filters
     Flip = 5,
     Rotate = 6,
     DarkenAndLighten = 7,
-    Resizing = 8,
-    merge_images = 9,
+    Resize = 8,
+    MergeImages = 9,
     EdgeDetection = 10,
-    Resize_Image = 11,
+    Crop = 11,
     Blur = 12,
     Sunlight = 13,
     OldTV = 14,
-    Tv_Effect = 15,
+    PurpleNight = 15,
     Infrared = 16,
-    Skew_Image = 17,
-    Oil_painting = 18,
+    SkewImage = 17,
+    OilPainting = 18,
 };
 
 enum MainMenuChoices 
@@ -80,7 +80,7 @@ void GrayscaleFilter(Image& image)
     }
 }
 
-void ApplyBlackAndWhite(Image& image)
+void BlackAndWhiteFilter(Image& image)
 {
     for (int i = 0; i < image.width; i++)
     {
@@ -174,7 +174,7 @@ void FlipFilter(Image& image)
     }
 }
 
-void RotateImage(Image& image)
+void RotateFilter(Image& image)
 {
     int rotation;
 
@@ -240,7 +240,7 @@ void RotateImage(Image& image)
     }
 }
 
-void DarkenAndLightenImage(Image& image)
+void DarkenAndLightenFilter(Image& image)
 {
     int choice;
 
@@ -311,28 +311,87 @@ void ResizeFilter(Image& image)
 
 void MergeFilter(Image& image)
 {
-    Image image2;
     string filename;
+    int choice;
 
-    cout << "Enter second image name: ";
+    cout << "Enter second image name with extension: ";
     cin >> filename;
 
-    image2.loadNewImage(filename);
+    Image image2;
 
-    int width = min(image.width, image2.width);
-    int height = min(image.height, image2.height);
-
-    for (int i = 0; i < width; i++)
+    try
     {
-        for (int j = 0; j < height; j++)
+        image2.loadNewImage(filename);
+    }
+    catch (...)
+    {
+        cout << "Failed to load second image.\n";
+        return;
+    }
+
+    cout << "\nChoose merge method:\n";
+    cout << "1. Resize both images to the largest dimensions\n";
+    cout << "2. Merge the common area only\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
+
+    int width, height;
+
+    if (choice == 1)
+    {
+        width = max(image.width, image2.width);
+        height = max(image.height, image2.height);
+
+        Image result(width, height);
+
+        for (int i = 0; i < width; i++)
         {
-            for (int k = 0; k < 3; k++)
+            for (int j = 0; j < height; j++)
             {
-                image(i, j, k) =
-                    (image(i, j, k) + image2(i, j, k)) / 2;
+                int x1 = i * image.width / width;
+                int y1 = j * image.height / height;
+
+                int x2 = i * image2.width / width;
+                int y2 = j * image2.height / height;
+
+                for (int k = 0; k < 3; k++)
+                {
+                    result(i, j, k) =
+                        (image(x1, y1, k) + image2(x2, y2, k)) / 2;
+                }
             }
         }
+
+        image = result;
     }
+    else if (choice == 2)
+    {
+        width = min(image.width, image2.width);
+        height = min(image.height, image2.height);
+
+        Image result(width, height);
+
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                for (int k = 0; k < 3; k++)
+                {
+                    result(i, j, k) =
+                        (image(i, j, k) + image2(i, j, k)) / 2;
+                }
+            }
+        }
+
+        image = result;
+    }
+    else
+    {
+        cout << "Invalid choice.\n";
+        return;
+    }
+
+    cout << "Merge Images applied successfully!\n";
 }
 
 void SunlightFilter(Image& image)
@@ -362,7 +421,7 @@ void SunlightFilter(Image& image)
     }
 }
 
-void ApplyBlur(Image& img) { int rad = 3; Image temp(img.width, img.height);
+void BlurFilter(Image& img) { int rad = 3; Image temp(img.width, img.height);
 for (int i = 0; i < img.width; i++) {
     for (int j = 0; j < img.height; j++) {
         for (int k = 0; k < img.channels; k++) {
@@ -388,7 +447,7 @@ img = temp;
 cout << "Image blurred successfully\n";
 }
 
-void ApplyInfrared(Image& img) {
+void InfraredFilter(Image& img) {
     for (int i = 0; i < img.width; i++) {
         for (int j = 0; j < img.height; j++) {
             img(i, j, 0) = 255 - img(i, j, 0);
@@ -399,7 +458,7 @@ void ApplyInfrared(Image& img) {
     cout << "Image infrared successfully!\n";
 }
 
-void ApplyEdgeDetection(Image& image)
+void EdgeDetectionFilter(Image& image)
 {
     Image result(image.width, image.height);
 
@@ -477,7 +536,7 @@ void OldTVFilter(Image& image)
     }
 }
 
-void applyOilPainting(Image& img) { int radius = 3; int levels = 20;
+void OilPaintingFilter(Image& img) { int radius = 3; int levels = 20;
 Image temp(img.width, img.height);
 
 for (int i = 0; i < img.width; i++) {
@@ -524,41 +583,62 @@ for (int i = 0; i < img.width; i++) {
 img = temp;
 }
 
-void ResizeImage(Image& image) 
+void CropFilter(Image& image)
 {
-    int new_width, new_height;
-    cout << "Enter new width and height: ";
-    cin >> new_width >> new_height;
+    int startX, startY, cropWidth, cropHeight;
 
-    Image new_image(new_width, new_height);
+    cout << "Enter starting X and Y: ";
+    cin >> startX >> startY;
 
-    for (int i = 0; i < new_width; ++i) {
-        for (int j = 0; j < new_height; ++j) {
-            int x = i * image.width / new_width;
-            int y = j * image.height / new_height;
+    cout << "Enter crop width and height: ";
+    cin >> cropWidth >> cropHeight;
 
-            for (int k = 0; k < 3; ++k) {
-                new_image(i, j, k) = image(x, y, k);
+    if (startX < 0 || startY < 0 ||
+        cropWidth <= 0 || cropHeight <= 0 ||
+        startX + cropWidth > image.width ||
+        startY + cropHeight > image.height)
+    {
+        cout << "Invalid crop dimensions or position!\n";
+        return;
+    }
+
+    Image cropped(cropWidth, cropHeight);
+
+    for (int x = 0; x < cropWidth; x++)
+    {
+        for (int y = 0; y < cropHeight; y++)
+        {
+            for (int c = 0; c < image.channels; c++)
+            {
+                cropped(x, y, c) =
+                    image(startX + x, startY + y, c);
             }
         }
     }
-    image = new_image;
+
+    image = cropped;
+
+    cout << "Image cropped successfully!\n";
 }
 
-void TvEffect(Image& image)
+void PurpleNightFilter(Image& image)
 {
-    for (int j = 0; j < image.height; ++j) {
-        if (j % 2 == 0) {
-            for (int i = 0; i < image.width; ++i) {
-                for (int k = 0; k < 3; ++k) {
-                    image(i, j, k) = image(i, j, k) * 0.5;
-                }
-            }
+    for (int i = 0; i < image.width; i++)
+    {
+        for (int j = 0; j < image.height; j++)
+        {
+            unsigned char R = image(i, j, 0);
+            unsigned char G = image(i, j, 1);
+            unsigned char B = image(i, j, 2);
+
+            image(i, j, 0) = (R + B) / 2;
+            image(i, j, 1) = G * 0.3;
+            image(i, j, 2) = min(255, (int)(B * 1.5));
         }
     }
 }
 
-void skew_image(Image& image)
+void SkewFilter(Image& image)
 {
     double angle;
     cout << "Enter angle to skew: ";
@@ -580,7 +660,6 @@ void skew_image(Image& image)
     }
     image = new_image;
 }
-
 
 
 // LOAD / SAVE
@@ -623,7 +702,6 @@ void SaveImage(Image& image)
 }
 
 
-
 // FILTER MENU
 
 void ShowFilterMenu()
@@ -639,14 +717,14 @@ void ShowFilterMenu()
     cout << " 5. Flip\n";
     cout << " 6. Rotate\n";
     cout << " 7. Darken and Lighten\n";
-    cout << " 8. Resizing\n";
+    cout << " 8. Resize Image\n";
     cout << " 9. Merge Images\n";
     cout << "10. Edge Detection\n";
-    cout << "11. Resize Image\n";
+    cout << "11. Crop\n";
     cout << "12. Blur\n";
     cout << "13. Sunlight\n";
     cout << "14. Old TV\n";
-    cout << "15. TV Effect\n";
+    cout << "15. Purple Night\n";
     cout << "16. Infrared\n";
     cout << "17. Skew Image\n";
     cout << "18. Oil Painting\n";
@@ -668,7 +746,7 @@ void ApplyFilter(Image& image, int choice)
 
     case Filters::BlackAndWhite:
 
-        ApplyBlackAndWhite(image);
+        BlackAndWhiteFilter(image);
         cout << "Black and White applied successfully!\n";
         break;
 
@@ -692,23 +770,23 @@ void ApplyFilter(Image& image, int choice)
 
     case Filters::Rotate:
 
-        RotateImage(image);
+        RotateFilter(image);
         cout << "Rotate applied successfully!\n";
         break;
 
     case Filters::DarkenAndLighten:
 
-        DarkenAndLightenImage(image);
+        DarkenAndLightenFilter(image);
         cout << "Darken and Lighten applied successfully!\n";
         break;
 
-    case Filters::Resizing:
+    case Filters::Resize:
 
         ResizeFilter(image);
         cout << "Resizing applied successfully!\n";
         break;
 
-    case Filters::merge_images:
+    case Filters::MergeImages:
 
         MergeFilter(image);
         cout << "Merge Images applied successfully!\n";
@@ -716,13 +794,13 @@ void ApplyFilter(Image& image, int choice)
 
     case Filters::EdgeDetection:
 
-        ApplyEdgeDetection(image);
+        EdgeDetectionFilter(image);
         cout << "Edge Detection applied successfully!\n";
         break;
 
     case Filters::Blur:
 
-        ApplyBlur(image);
+        BlurFilter(image);
         cout << "Blur applied successfully!\n";
         break;
 
@@ -740,31 +818,31 @@ void ApplyFilter(Image& image, int choice)
 
     case Filters::Infrared:
 
-        ApplyInfrared(image);
+        InfraredFilter(image);
         cout << "Infrared applied successfully!\n";
         break;
 
-        case Filters::Oil_painting:
+        case Filters::OilPainting:
             
-        applyOilPainting(image);
+        OilPaintingFilter(image);
         cout << "Oil Painting applied successfully!\n";
         break;
 
-        case Filters::Resize_Image:
+        case Filters::Crop:
 
-            ResizeImage(image);
-            cout << "Resize Image applied successfully!\n";
+            CropFilter(image);
+            cout << "Crop Filter applied successfully!\n";
             break;
 
-        case Filters::Tv_Effect:
+        case Filters::PurpleNight:
 
-            TvEffect(image);
-            cout << "TV Effect applied successfully!\n";
+            PurpleNightFilter(image);
+            cout << "Purple Night Filter applied successfully!\n";
             break;
 
-        case Filters::Skew_Image:
+        case Filters::SkewImage:
 
-            skew_image(image);
+            SkewFilter(image);
             cout << "Skew Image applied successfully!\n";
             break;
 
@@ -774,7 +852,6 @@ void ApplyFilter(Image& image, int choice)
     }  
 }
     
-
 void FilterMenu(Image& image)
 {
     int choice;
