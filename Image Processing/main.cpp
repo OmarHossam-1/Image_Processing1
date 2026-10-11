@@ -391,7 +391,6 @@ void MergeFilter(Image& image)
         return;
     }
 
-    cout << "Merge Images applied successfully!\n";
 }
 
 void SunlightFilter(Image& image)
@@ -444,19 +443,45 @@ for (int i = 0; i < img.width; i++) {
     }
 }
 img = temp;
-cout << "Image blurred successfully\n";
 }
+
 
 void InfraredFilter(Image& img) {
     for (int i = 0; i < img.width; i++) {
         for (int j = 0; j < img.height; j++) {
-            img(i, j, 0) = 255 - img(i, j, 0);
-            img(i, j, 1) = 255 - img(i, j, 1);
-            img(i, j, 2) = 255 - img(i, j, 2);
+
+            int r = img(i, j, 0);
+            int g = img(i, j, 1);
+            int b = img(i, j, 2);
+
+            int intensity = (r + g + b) / 3;
+
+            int newR, newG, newB;
+
+            if (intensity < 85) {
+                newR = 0;
+                newG = 0;
+                newB = intensity * 3;
+            }
+            else if (intensity < 170) {
+                newR = (intensity - 85) * 3;
+                newG = 0;
+                newB = 255 - (intensity - 85) * 3;
+            }
+            else {
+                newR = 255;
+                newG = (intensity - 170) * 3;
+                newB = 0;
+            }
+
+            img(i, j, 0) = newR;
+            img(i, j, 1) = newG;
+            img(i, j, 2) = newB;
         }
     }
-    cout << "Image infrared successfully!\n";
+
 }
+
 
 void EdgeDetectionFilter(Image& image)
 {
