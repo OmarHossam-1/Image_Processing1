@@ -1,23 +1,25 @@
 /*
-    CS213 - OOP Programming Assignment 1
-    Part 1
+CS213 - OOP Programming Assignment 1
 
-    Team Members:
-    20250117 - Belal Ibrahim Sayed
-    20250426 - Omar Hossam Eldin Zidan
-    20251551 - Ahmed Mahmoud Roshdy
-    20253056 - Shahd Ali Mohammed
+Final Submission
 
-    Section: (S7,S8)
+Team Members:
+20250117 - Belal Ibrahim Sayed
+20250426 - Omar Hossam Eldin Zidan
+20251551 - Ahmed Mahmoud Roshdy
+20253056 - Shahd Ali Mohammed
 
-    Filter Distribution:
-    Belal  : Filters 1, 5, 9, 13
-    Omar   : Filters 2, 6, 10, 14
-    Ahmed  : Filters 3, 7, 11, 15
-    Shahd  : Filters 4, 8, 12, 16
+Section: (S7,S8)
 
-    Part 1:
-    8 Filters + Console Menu
+Filter Distribution:
+Belal  : Filters 1, 5, 9, 13 + GUI Development
+Omar   : Filters 2, 6, 10, 14 + GUI Development
+Ahmed  : Filters 3, 7, 11, 15, 17
+Shahd  : Filters 4, 8, 12, 16, 18
+
+Final Submission:
+18 Filters + Graphical User Interface (GUI)
+
 */
 
 #include <iostream>
